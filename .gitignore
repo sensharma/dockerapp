@@ -1,4 +1,4 @@
-dbdata/*
+dbdata/
 
 # Distribution / packaging
 **/__pycache__
