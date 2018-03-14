@@ -1,0 +1,66 @@
+version: '3'
+services:
+  back:
+    build: .
+  cpuengine:
+  gpuengine:
+  rabbit:
+  redis:
+  nginx:
+  front:
+  datapersist:
+  postgres:
+
+These are probably the services(as per docker-compose file)/containers that make for a good start:
+
+  Service 1: Django (uncluding uWSGI, celery, gevent etc.) -> hmm gevent probably also needed in dl/ml containers? Or connect via docker network?
+   
+  Service 2: 2. DeepLearning (GPU and CUDA dependent)(Tensorflow, PyTorch, Mxnet, Cntk - Keras etc.) & Analytics (pandas, numpy, sklearn, scipy etc.) gunicorn/uWSGI as app server -probably uwsgi?
+  
+  Service 3: DeepLearning (CPU) & Analytics (pandas, numpy, sklearn, scipy etc.) - gunicorn/uWSGI as app server -probably uwsgi?
+
+  Service 4. db: Postgres (think persistence and backup)
+
+  Service 5. celery OR rq: for async task-queuing etc.
+  Celery can use either redis or RabbitMQ as data/message broker (also some others)
+  rq (redismq) (link: http://python-rq.org/): can only use redis as broker
+
+ (can be used for some backup or in memory quick database functions - read up)
+
+ For celery:
+ (See installation details for RabbitMQ: http://docs.celeryproject.org/en/latest/getting-started/brokers/rabbitmq.html 
+    or
+ Redis: http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html)
+ (Read this for rq vs celery+rabbit: https://stackoverflow.com/questions/13440875/pros-and-cons-to-use-celery-vs-rq)
+
+ Service 6. rabbit or redis: either will work with celery. rq needs redis. RabbitMQ meant to be a bit more full featured etc.
+ (Read this for rabbitmq vs redis as data/message broker: https://stackoverflow.com/questions/29539443/redis-vs-rabbitmq-as-a-data-broker-messaging-system-in-between-logstash-and-elas)
+
+ OVERALL summary of distributed queues and data/message broking
+ (Read: https://blog.syncano.io/configuring-running-django-celery-docker-containers-pt-1/)
+
+ Think 4 steps:
+      i) Tasks, as defined in your app
+      ii) A broker that routes tasks to workers and queues (rabbitmq or redis)
+      iii) Workers doing the actual work (celery or rq)
+      iv) A storage backend (redis)
+ Therefore the 3 possible solutions are:
+      i) Celery (as task queue workers) + rabbitmq, or other (broker) + redis (storage backend)
+      ii) Celery (as task queue workers) + redis (as both broker + storage backend)
+      iii) rq (as task queue workers) + redis (as both broker + storage backend)
+
+ I think Celery + RabbitMQ + redis is best.
+ NOTE: There are faster brokers than RabbitMQ, e.g. Kafka. But only for reliable consumers. May be used in parallel.
+ (Read: https://yurisubach.com/2016/05/19/kafka-or-rabbitmq/)
+
+ QUESTION: Are all these done away with under django-channels (i.e. the websockets/daphne/asgi) paradigm?
+ ANS:    Don't think so. The async websockets paradigm needs to be implemented separately to the http/wsgi paradigm, I think.
+
+ Service 7. Nginx - i) Webserver, ii) reverse-proxy, iii) load balancer and iv) serving static files (app server would get jammed if it had to serve static files)
+
+ (Some contend that if uwsgi used instead of gunicorn(fast etc.) and static files served via a separate Amazon CDN, then Nginx may not be required. Hmm..
+ 49 Links: 1)
+ )
+ Service 8. Angular2/Typescript (Apache/nginx as app server?)
+
+ (There may need to be multiple databases, say one for user data, one for user uploaded data, one for market/other datafeeds etc.)

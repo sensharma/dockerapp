@@ -1,0 +1,40 @@
+version: '3.5'  
+services:  
+  nginx:
+    restart: always
+    image: nginx:latest
+    container_name: ng01
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/src
+      - ./config/nginx:/etc/nginx/conf.d
+    # the web service needs to be started before nginx started
+    depends_on:
+      - web 
+  web:
+    restart: always
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    image: djtest:latest
+    container_name: dg01
+    # remember for later: uwsgi is much faster than gunicorn. but more difficult to set up
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn mydjango.wsgi -b 0.0.0.0:8000"
+    # for django dev server:
+    # command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+    volumes:
+      - ./src:/src
+    expose:
+      - "8000"
+
+  db:
+    restart: always
+    image: postgres:latest
+    container_name: ps01
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

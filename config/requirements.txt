@@ -1,0 +1,42 @@
+Django>=2.0
+#redis for use with django-channels (asgi as opposed to the standard django wsgi)
+# asgi-redis
+#async task/job queue: works with rabbitmq (recommened) or redis
+# celery
+#django for websockets
+# channels
+#django/djangorest add-ons
+# coreapi
+# django-crispy-forms
+#for CORS (Cross-Origin Resource Sharing headers to http responses -> may sort out issues with angular
+# django-cors-headers
+#12factor inspired dj utility to use DATABASE_URL env variable
+# dj-database-url
+# django-filter
+# django-guardian
+# django-redis
+# djangorestframework
+#celery real-time monitoring
+# flower
+#coroutine based 
+# gevent
+#backend application (non-static) server -> static will be served by nginx:
+gunicorn
+uwsgi
+#celery add-on
+# jobtastic
+# markdown
+#rabbitmq python client:
+# pika
+#for postgres:
+psycopg2
+# pyzmq
+#python client for redis as message brokers
+# redis
+#very fast serialization lib (as is ujson):
+# serpy
+# sqlalchemy
+#meant to be very fast serialization etc.
+# ujson
+#meant to be able to serve static files without nginx etc
+# whitenoise
