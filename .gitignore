@@ -1,7 +1,7 @@
 dbdata/*
 
 # Distribution / packaging
-src/*/.__pycache__
+**/__pycache__
 
 # Django stuff:
 *.log
