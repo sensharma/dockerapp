@@ -1,5 +1,5 @@
-version: '3.5'  
-services:  
+version: '3.5'
+services:
   nginx:
     restart: always
     image: nginx:latest
@@ -11,10 +11,10 @@ services:
       - ./config/nginx:/etc/nginx/conf.d
     # the web service needs to be started before nginx started
     depends_on:
-      - web 
+      - web
   web:
     restart: always
-    build: 
+    build:
       context: .
       dockerfile: ./Dockerfile
     image: djtest:latest

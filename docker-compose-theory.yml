@@ -1,22 +1,23 @@
 version: '3'
 services:
-  back:
+  back (with Django, uwsgi (http) & daphne (websockets), DRF for REST & django-graphene for GraphQL):
     build: .
-  cpuengine:
-  gpuengine:
+  gpuengine: (also with uvloop & aiohttp for async serving (in addition to TensorFlow Serving, of course)):
+  cpuengine: (also with uvloop & aiohttp for async serving (in addition to TensorFlow Serving, of course)):
+  postgres:
+  celery:
   rabbit:
+    (celery & rabbit separate or together?)
   redis:
   nginx:
-  front:
-  datapersist:
-  postgres:
+  front (angular 5, bootstrap 4, TensorFlow.js etc):
 
 These are probably the services(as per docker-compose file)/containers that make for a good start:
 
   Service 1: Django (uncluding uWSGI, celery, gevent etc.) -> hmm gevent probably also needed in dl/ml containers? Or connect via docker network?
-   
+
   Service 2: 2. DeepLearning (GPU and CUDA dependent)(Tensorflow, PyTorch, Mxnet, Cntk - Keras etc.) & Analytics (pandas, numpy, sklearn, scipy etc.) gunicorn/uWSGI as app server -probably uwsgi?
-  
+
   Service 3: DeepLearning (CPU) & Analytics (pandas, numpy, sklearn, scipy etc.) - gunicorn/uWSGI as app server -probably uwsgi?
 
   Service 4. db: Postgres (think persistence and backup)
@@ -41,13 +42,14 @@ These are probably the services(as per docker-compose file)/containers that make
 
  Think 4 steps:
       i) Tasks, as defined in your app
-      ii) A broker that routes tasks to workers and queues (rabbitmq or redis)
+      ii) A broker that routes time-consuming tasks to workers and queues, to be done separately (rabbitmq or redis)
       iii) Workers doing the actual work (celery or rq)
-      iv) A storage backend (redis)
+      iv) A broker database - celery stores the jobs as json in the this database, from which it allocates to workers (redis)
+          Redis is a good choice here since it can also be used for other website functions such as caching.
  Therefore the 3 possible solutions are:
-      i) Celery (as task queue workers) + rabbitmq, or other (broker) + redis (storage backend)
-      ii) Celery (as task queue workers) + redis (as both broker + storage backend)
-      iii) rq (as task queue workers) + redis (as both broker + storage backend)
+      i) Celery (as task queue workers) + rabbitmq, or other (broker) + redis (broker database. additionally, caching database)
+      ii) Celery (as task queue workers) + redis (as both broker + broker database, additionally caching database)
+      iii) rq (as task queue workers) + redis (as both broker + broker database, additionally caching database)
 
  I think Celery + RabbitMQ + redis is best.
  NOTE: There are faster brokers than RabbitMQ, e.g. Kafka. But only for reliable consumers. May be used in parallel.
@@ -56,11 +58,17 @@ These are probably the services(as per docker-compose file)/containers that make
  QUESTION: Are all these done away with under django-channels (i.e. the websockets/daphne/asgi) paradigm?
  ANS:    Don't think so. The async websockets paradigm needs to be implemented separately to the http/wsgi paradigm, I think.
 
+ That's right. Message broking and websockets are disconnected ideas. Websockets are just persistent "socket connections"
+
+ Also: http (wsgi - uwsgi/gunicorn) & websockets (asgi - daphne) are to be set up separately & tasks assigned to them by nginx. See article on it.
+
+ for both http & websockets, the API protocol can be REST or GraphQL (REST has different entry points(URI) for different resources, GraphQL has single entrypoint for all resources, and is parsed at the backend)
+
  Service 7. Nginx - i) Webserver, ii) reverse-proxy, iii) load balancer and iv) serving static files (app server would get jammed if it had to serve static files)
 
  (Some contend that if uwsgi used instead of gunicorn(fast etc.) and static files served via a separate Amazon CDN, then Nginx may not be required. Hmm..
  49 Links: 1)
- )
- Service 8. Angular2/Typescript (Apache/nginx as app server?)
+
+ Service 8. Angular2/Typescript (Apache/nginx (how about express/hapi) as app server?)
 
  (There may need to be multiple databases, say one for user data, one for user uploaded data, one for market/other datafeeds etc.)
