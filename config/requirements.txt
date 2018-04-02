@@ -1,42 +1,57 @@
 Django>=2.0
 #redis for use with django-channels (asgi as opposed to the standard django wsgi)
-# asgi-redis
+asgi-redis
 #async task/job queue: works with rabbitmq (recommened) or redis
-# celery
+celery
 #django for websockets
-# channels
+channels
+#built on top of asyncio which can be sped up with uvloop
+websockets
+#websockets client
+websocket-client
 #django/djangorest add-ons
-# coreapi
-# django-crispy-forms
+coreapi
+django-crispy-forms
 #for CORS (Cross-Origin Resource Sharing headers to http responses -> may sort out issues with angular
-# django-cors-headers
+django-cors-headers
 #12factor inspired dj utility to use DATABASE_URL env variable
-# dj-database-url
-# django-filter
-# django-guardian
-# django-redis
-# djangorestframework
+dj-database-url
+django-filter
+django-guardian
+django-redis
+djangorestframework
 #celery real-time monitoring
-# flower
-#coroutine based 
-# gevent
+flower
+#faster event loops with asyncio if required
+uvloop
+#faster http parsing etc.
+httptools
+pycohttpparser
 #backend application (non-static) server -> static will be served by nginx:
 gunicorn
 uwsgi
 #celery add-on
-# jobtastic
-# markdown
+jobtastic
+markdown
 #rabbitmq python client:
-# pika
+pika
 #for postgres:
 psycopg2
-# pyzmq
+pyzmq
 #python client for redis as message brokers
-# redis
+redis
 #very fast serialization lib (as is ujson):
-# serpy
-# sqlalchemy
+serpy
+sqlalchemy
 #meant to be very fast serialization etc.
-# ujson
+ujson
 #meant to be able to serve static files without nginx etc
-# whitenoise
+whitenoise
+#graphql stuff
+graphene
+graphene-django
+graphql-ws
+djang-graphql-jwt
+graphene-sqlalchemy
+#rpc (stuff used by tensorflow serving)
+grpcio
