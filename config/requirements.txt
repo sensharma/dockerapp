@@ -1,8 +1,9 @@
 Django>=2.0
 #redis for use with django-channels (asgi as opposed to the standard django wsgi)
 asgi-redis
-#async task/job queue: works with rabbitmq (recommened) or redis
+#async task/job queue: works with rabbitmq (recommended) or redis
 celery
+joblib
 #django for websockets
 channels
 #built on top of asyncio which can be sped up with uvloop
@@ -27,9 +28,8 @@ uvloop
 #faster http parsing etc.
 httptools
 pycohttpparser
-#backend application (non-static) server -> static will be served by nginx:
+#backend application (non-static) http server -> static will be served by nginx, websockets by daphne(channels): uwsgi installed with conda
 gunicorn
-uwsgi
 #celery add-on
 jobtastic
 markdown
@@ -51,7 +51,7 @@ whitenoise
 graphene
 graphene-django
 graphql-ws
-djang-graphql-jwt
+django-graphql-jwt
 graphene-sqlalchemy
 #rpc (stuff used by tensorflow serving)
 grpcio
